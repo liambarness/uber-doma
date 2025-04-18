@@ -39,8 +39,8 @@ This implementation uses a simplified 3-domain model:
 ## Running Locally
 
 1.  **Prerequisites:** Node.js, npm, Google Cloud SDK (`gcloud` CLI).
-2.  **Start Pub/Sub Emulator:** This project **requires the Google Cloud Pub/Sub Emulator** running locally.
-3.  **Setup Pub/Sub:** Create the necessary topics (`ride-requested`, `payment-processed`, `ride-updates`) and subscriptions within the emulator.
+2.  **Start Pub/Sub Emulator:** This project **requires the Google Cloud Pub/Sub Emulator** running locally `gcloud beta emulators pubsub start --project=test-project --host-port=localhost:8538`.
+3.  **Setup Pub/Sub:** Create the necessary topics (`ride-requested`, `payment-processed`, `ride-updates`) and subscriptions within the emulator. (emulator folder does this)
 4.  **Install Dependencies:** Run `npm install` in each of the 6 service/gateway directories.
 5.  **Run Services:**
     *   Open 6 separate terminals.
