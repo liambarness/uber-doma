@@ -3,11 +3,10 @@ const { PubSub } = require("@google-cloud/pubsub");
 const axios = require("axios");
 
 const app = express();
-const port = process.env.PORT || 8082; // Doesn't need to be exposed externally in K8s
+const port = process.env.PORT || 8082;
 const pubsubClient = new PubSub();
-const subscriptionName = "driver-gateway-sub"; // GCP Pub/Sub subscription
+const subscriptionName = "driver-gateway-sub";
 
-// URL for the internal assign-driver-service
 const ASSIGN_DRIVER_SERVICE_URL =
   process.env.ASSIGN_DRIVER_SERVICE_URL || "http://localhost:3003";
 
@@ -20,12 +19,11 @@ function listenForMessages() {
     const messageData = JSON.parse(message.data.toString());
     console.log(`\tData: ${JSON.stringify(messageData)}`);
 
-    // Check if payment was successful before proceeding
     if (messageData.paymentStatus !== "SUCCESS") {
       console.log(
         `[Driver Gateway] Skipping driver assignment for Ride ${messageData.rideRequestId} due to payment status: ${messageData.paymentStatus}`
       );
-      message.ack(); // Acknowledge message, as no action needed for failed payments here
+      message.ack();
       return;
     }
 
@@ -40,7 +38,6 @@ function listenForMessages() {
           rideRequestId: messageData.rideRequestId,
           userId: messageData.userId,
           paymentId: messageData.paymentId,
-          // Pass other relevant details if needed
         }
       );
       console.log(
@@ -74,9 +71,6 @@ function listenForMessages() {
 }
 
 listenForMessages();
-
-// Optional: Add a health check endpoint
-app.get("/health", (req, res) => res.status(200).send("OK"));
 
 app.listen(port, () => {
   console.log(`Driver Gateway (listener) running on port ${port}`);

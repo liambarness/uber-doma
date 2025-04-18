@@ -3,11 +3,10 @@ const { PubSub } = require("@google-cloud/pubsub");
 const axios = require("axios");
 
 const app = express();
-const port = process.env.PORT || 8081; // Doesn't need to be exposed externally in K8s
+const port = process.env.PORT || 8081;
 const pubsubClient = new PubSub();
-const subscriptionName = "payments-gateway-sub"; // GCP Pub/Sub subscription
+const subscriptionName = "payments-gateway-sub";
 
-// URL for the internal process-payment-service
 const PROCESS_PAYMENT_SERVICE_URL =
   process.env.PROCESS_PAYMENT_SERVICE_URL || "http://localhost:3002";
 
@@ -30,7 +29,6 @@ function listenForMessages() {
         {
           rideRequestId: messageData.rideRequestId,
           userId: messageData.userId,
-          // Pass other relevant details if needed
         }
       );
       console.log(
@@ -45,8 +43,6 @@ function listenForMessages() {
         `[Payments Gateway] Error processing message ${message.id}: ${error.message}`,
         error.response?.data
       );
-      // Decide if the message should be Nacked (re-tried) or Acked (discarded)
-      // For simplicity, Nack to allow retries. Configure dead-lettering in Pub/Sub for production.
       message.nack();
       console.log(`[Payments Gateway] Message ${message.id} nacked.`);
     }
@@ -54,7 +50,6 @@ function listenForMessages() {
 
   const errorHandler = (error) => {
     console.error(`[Payments Gateway] Received error: ${error.message}`);
-    // Potentially exit or implement retry logic for the listener itself
   };
 
   subscription.on("message", messageHandler);
@@ -67,9 +62,6 @@ function listenForMessages() {
 
 // Start listening for Pub/Sub messages when the server starts
 listenForMessages();
-
-// Optional: Add a health check endpoint
-app.get("/health", (req, res) => res.status(200).send("OK"));
 
 app.listen(port, () => {
   console.log(`Payments Gateway (listener) running on port ${port}`);

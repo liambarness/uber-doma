@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Uber DOMA Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      label,
+      input {
+        display: block;
+        margin-bottom: 10px;
+      }
+      input {
+        min-width: 200px;
+      }
+      button {
+        padding: 10px 15px;
+      }
+      #response,
+      #logs {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Uber Ride Request</h1>
+
+    <label for="userId">User ID:</label>
+    <input type="text" id="userId" value="user123" />
+
+    <label for="pickup">Pickup Location:</label>
+    <input type="text" id="pickup" value="123 Main St" />
+
+    <label for="destination">Destination:</label>
+    <input type="text" id="destination" value="456 Oak Ave" />
+
+    <button onclick="requestRide()">Request Ride</button>
+
+    <h2>Response:</h2>
+    <div id="response">Click the button to send a request...</div>
+
+    <script>
+      // --- IMPORTANT ---
+      // Replace with the actual External IP address
+      const RIDER_GATEWAY_IP = "localhost:8080";
+
+      const apiUrl = `http://${RIDER_GATEWAY_IP}/request-ride`;
+
+      async function requestRide() {
+        const userId = document.getElementById("userId").value;
+        const pickup = document.getElementById("pickup").value;
+        const destination = document.getElementById("destination").value;
+        const responseDiv = document.getElementById("response");
+
+        responseDiv.textContent = "Sending request...";
+
+        if (
+          !RIDER_GATEWAY_IP ||
+          RIDER_GATEWAY_IP === "YOUR_RIDER_GATEWAY_EXTERNAL_IP"
+        ) {
+          responseDiv.textContent =
+            "Error: Please update RIDER_GATEWAY_IP in the script tag with the external IP of the rider-gateway-service.";
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              pickupLocation: pickup,
+              destination: destination,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            responseDiv.textContent = `Success (${
+              response.status
+            }):\n${JSON.stringify(data, null, 2)}`;
+          } else {
+            responseDiv.textContent = `Error (${
+              response.status
+            }):\n${JSON.stringify(data, null, 2)}`;
+          }
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          responseDiv.textContent = `Network or Fetch Error: ${error.message}. Check browser console and ensure the Gateway IP is correct and reachable.`;
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,9 +1,11 @@
 const express = require("express");
-const axios = require("axios"); // To call the internal service
+const axios = require("axios");
+const cors = require("cors"); // cors for local testing
 
 const app = express();
 app.use(express.json());
-const port = process.env.PORT || 8080; // Exposed port
+app.use(cors());
+const port = process.env.PORT || 8080;
 
 const REQUEST_RIDE_SERVICE_URL =
   process.env.REQUEST_RIDE_SERVICE_URL || "http://localhost:3001";
@@ -33,6 +35,7 @@ app.post("/request-ride", async (req, res) => {
     console.log(
       `[Rider Gateway] Forwarded request, service responded with status ${serviceResponse.status}`
     );
+
     // Return the response from the internal service to the client
     res.status(serviceResponse.status).json(serviceResponse.data);
   } catch (error) {
