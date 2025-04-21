@@ -40,7 +40,7 @@ This implementation uses a simplified 3-domain model:
 
 1.  **Prerequisites:** Node.js, npm, Google Cloud SDK (`gcloud` CLI).
 2.  **Start Pub/Sub Emulator:** This project **requires the Google Cloud Pub/Sub Emulator** running locally `gcloud beta emulators pubsub start --project=test-project --host-port=localhost:8538`.
-3.  **Setup Pub/Sub:** Create the necessary topics (`ride-requested`, `payment-processed`, `ride-updates`) and subscriptions within the emulator. (emulator folder does this)
+3.  **Setup Pub/Sub:** Create the necessary topics (`ride-requested`, `payment-processed`, `ride-updates`) and subscriptions within the emulator. (emulator folder does this, just `node server.js` in the emulator directory)
 4.  **Install Dependencies:** Run `npm install` in each of the 6 service/gateway directories.
 5.  **Run Services:**
     *   Open 6 separate terminals.
@@ -48,6 +48,13 @@ This implementation uses a simplified 3-domain model:
     *   Set required environment variables (e.g., `PORT`, `PUBSUB_EMULATOR_HOST=localhost:8538`, internal `*_SERVICE_URL`s). (WILL WORK WITHOUT SETTING ENV VARIABLES)
     *   Run `node server.js`.
 6.  **Test Frontend:** Open the `index.html` file in your browser and use the interface to request a ride. Observe the logs across the service terminals and the status updates on the frontend.
+
+## Running Locally with Docker Compose
+1. **Prerequisites:** Node.js, npm, Google Cloud SDK (`gcloud` CLI).
+2. **Start Pub/Sub Emulator:** Run pub/sub emulator locally. `gcloud beta emulators pubsub start --project=test-project --host-port=localhost:8538`.
+3. **Setup Pub/Sub:** Create the necessary topics (`ride-requested`, `payment-processed`, `ride-updates`) and subscriptions within the emulator. (emulator folder does this, just `node server.js` in the emulator directory)
+4. **Run Docker Compose:** Navigate to the root directory /uber-doma. Run `docker-compose up`.
+5. **Test Frontend:** Open the `index.html` file in your browser and use the interface to request a ride. Observe the logs in the docker-compose console and the status updates on the frontend.
 
 ## Deployment
 
