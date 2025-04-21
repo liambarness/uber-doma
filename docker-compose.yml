@@ -1,0 +1,84 @@
+version: '3'
+
+services:
+  # Rider Domain
+  request-ride-service:
+    build: ./rider-domain/request-ride-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    networks:
+      - uber-network
+
+  rider-gateway:
+    build: ./rider-domain/rider-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - REQUEST_RIDE_SERVICE_URL=http://request-ride-service:3001
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    depends_on:
+      - request-ride-service
+    networks:
+      - uber-network
+
+  # Payment Domain
+  process-payment-service:
+    build: ./payment-domain/process-payment-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    networks:
+      - uber-network
+
+  payment-gateway:
+    build: ./payment-domain/payment-gateway
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - PROCESS_PAYMENT_SERVICE_URL=http://process-payment-service:3002
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    depends_on:
+      - process-payment-service
+    networks:
+      - uber-network
+
+  # Driver Domain
+  assign-driver-service:
+    build: ./driver-domain/assign-driver-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    networks:
+      - uber-network
+
+  driver-gateway:
+    build: ./driver-domain/driver-gateway
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - ASSIGN_DRIVER_SERVICE_URL=http://assign-driver-service:3003
+      - PUBSUB_EMULATOR_HOST=host.docker.internal:8538
+      - GOOGLE_CLOUD_PROJECT=test-project
+    depends_on:
+      - assign-driver-service
+    networks:
+      - uber-network
+
+networks:
+  uber-network:
+    driver: bridge
